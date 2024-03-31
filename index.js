@@ -43,9 +43,14 @@ async function run() {
 
     app.post('/users', async (req, res) => {
       const user = req.body
-      const query = { email: user.email }
-      const existingUser = await userCollection.findOne(query)
-      if (existingUser) {
+      const queryEmail = { email: user.userEmail }
+      const queryID = { userID: user.userID }
+      const existingUserEmail = await userCollection.findOne(queryEmail)
+      const existingUserID = await userCollection.findOne(queryID)
+      if (existingUserEmail) {
+        return res.send({ message: 'user already exists', insertedId: null })
+      }
+      if (existingUserID) {
         return res.send({ message: 'user already exists', insertedId: null })
       }
       const result = await userCollection.insertOne(user)
@@ -60,6 +65,26 @@ async function run() {
       const email=req.params.email;
       const query={userEmail:email}
       const result = await userCollection.findOne(query)
+      res.send(result)
+    })
+
+    app.patch('/users/:id',async(req,res)=>{
+      const id=req.params.id;
+      const query={_id:new ObjectId(id)}
+      const existingRole=req.body.role;
+      const updatedRole={
+        $set:{
+          role:existingRole
+        }
+      }
+      const result=await userCollection.updateOne(query,updatedRole)
+      res.send(result)
+    })
+
+    app.delete('/users/:id',async(req,res)=>{
+      const id=req.params.id;
+      const query={_id:new ObjectId(id)}
+      const result=await userCollection.deleteOne(query)
       res.send(result)
     })
     // products related api
@@ -83,6 +108,24 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await productsCollection.findOne(query)
+      res.send(result)
+    })
+    app.patch('/products/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const existingProduct=req.body;
+      const updatedProduct={
+        $set:{
+          productName:existingProduct.productName, 
+          amount:existingProduct.amount, 
+          quantity:existingProduct.quantity, 
+          category:existingProduct.category, 
+          price:existingProduct.price, 
+          brandName:existingProduct.brandName, 
+          imageURL:existingProduct.imageURL, 
+        }
+      }
+      const result = await productsCollection.updateOne(query,updatedProduct)
       res.send(result)
     })
 
