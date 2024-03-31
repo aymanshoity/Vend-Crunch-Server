@@ -34,6 +34,7 @@ async function run() {
     const productsCollection = client.db("Vend-Crunch").collection("products");
     const userCollection = client.db("Vend-Crunch").collection("users");
     const cartItemCollection = client.db("Vend-Crunch").collection("cart");
+    const feedbackCollection = client.db("Vend-Crunch").collection("feedbacks");
 
 
 
@@ -85,6 +86,12 @@ async function run() {
       res.send(result)
     })
 
+    app.post('/products',async(req,res)=>{
+      const item=req.body;
+      const cursor=await productsCollection.insertOne(item)
+      res.send(cursor)
+    })
+
     // cart related api
     app.post('/cart',async(req,res)=>{
       const cartItem=req.body;
@@ -109,6 +116,18 @@ async function run() {
       const query={_id:new ObjectId(id)}
       const result=await cartItemCollection.deleteOne(query)
       res.send(result)
+    })
+
+    // feedbacks related api
+
+    app.post('/feedbacks',async(req,res)=>{
+      const feedback=req.body;
+      const cursor=await feedbackCollection.insertOne(feedback)
+      res.send(cursor)
+    })
+    app.get('/feedbacks',async(req,res)=>{
+      const cursor=await feedbackCollection.find().toArray()
+      res.send(cursor)
     })
 
 
